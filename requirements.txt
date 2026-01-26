@@ -1,0 +1,5 @@
+requests==2.32.3
+h5py==3.13.0
+matplotlib==3.10.1
+flask==3.1.0
+flask-cors==5.0.1

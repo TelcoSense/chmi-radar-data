@@ -1,0 +1,10 @@
+
+__pycache__/
+maxz/
+maxz_png/
+merge1h/
+merge1h_png/
+pseudocappi2km/
+pseudocappi2km_png/
+
+*.log
