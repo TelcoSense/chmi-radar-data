@@ -28,6 +28,9 @@ MAXZ_PNG_FOLDER.mkdir(parents=True, exist_ok=True)
 MERGE1H_PNG_FOLDER = Path("merge1h_png")
 MERGE1H_PNG_FOLDER.mkdir(parents=True, exist_ok=True)
 
+CAPPI2KM_PNG_FOLDER = Path("pseudocappi2km_png")
+CAPPI2KM_PNG_FOLDER.mkdir(parents=True, exist_ok=True)
+
 DEFAULT_CHECK_INTERVAL = 30  # seconds
 DEFAULT_LOG_FILE = Path("radar_data_realtime.log")
 DISCORD_WEBHOOK_URL = ""
@@ -186,6 +189,15 @@ def main(check_every):
                             try:
                                 convert_merge1h_to_png(
                                     local_folder / file_name, MERGE1H_PNG_FOLDER
+                                )
+                            except Exception as e:
+                                error_msg = f"Failed to convert {file_name} to PNG: {e}"
+                                logging.error(error_msg)
+                                notify_discord(error_msg)
+                        if local_folder.name == "pseudocappi2km":
+                            try:
+                                convert_maxz_to_png(
+                                    local_folder / file_name, CAPPI2KM_PNG_FOLDER
                                 )
                             except Exception as e:
                                 error_msg = f"Failed to convert {file_name} to PNG: {e}"
