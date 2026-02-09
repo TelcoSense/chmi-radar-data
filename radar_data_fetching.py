@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from conversions import maxz_to_png, merge1h_to_png
+from conversions import hdf_to_png, merge1h_to_png
 
 FOLDER_MAPPINGS = {
     "https://opendata.chmi.cz/meteorology/weather/radar/composite/pseudocappi2km/hdf5/": Path(
@@ -55,7 +55,19 @@ def notify_discord(message: str):
 def convert_maxz_to_png(hdf_path: Path, output_folder: Path):
     temp_output = output_folder / hdf_path.with_suffix(".png").name
     logging.info(f"Converting {hdf_path.name} -> temporary {temp_output.name}")
-    rain_score = maxz_to_png(str(hdf_path), str(temp_output))
+    rain_score = hdf_to_png(hdf_path, temp_output, raw_visible_min=None)
+    score_str = f"{rain_score:.3f}"
+    final_name = hdf_path.with_suffix("").name + f"_{score_str}.png"
+    final_path = output_folder / final_name
+    logging.info(f"Renaming to final output: {final_path.name}")
+    temp_output.rename(final_path)
+    return final_path
+
+
+def convert_cappi_to_png(hdf_path: Path, output_folder: Path):
+    temp_output = output_folder / hdf_path.with_suffix(".png").name
+    logging.info(f"Converting {hdf_path.name} -> temporary {temp_output.name}")
+    rain_score = hdf_to_png(hdf_path, temp_output, raw_visible_min=78)
     score_str = f"{rain_score:.3f}"
     final_name = hdf_path.with_suffix("").name + f"_{score_str}.png"
     final_path = output_folder / final_name
@@ -196,7 +208,7 @@ def main(check_every):
                                 notify_discord(error_msg)
                         if local_folder.name == "pseudocappi2km":
                             try:
-                                convert_maxz_to_png(
+                                convert_cappi_to_png(
                                     local_folder / file_name, CAPPI2KM_PNG_FOLDER
                                 )
                             except Exception as e:
